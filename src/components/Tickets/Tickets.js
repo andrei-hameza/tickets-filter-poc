@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import Ticket from '../ticket';
+import Ticket from '../Ticket';
 
 class Tickets extends PureComponent {
   render() {
