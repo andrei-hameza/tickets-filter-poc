@@ -1,21 +1,18 @@
 import React, { Component } from 'react';
 import './App.css';
-import ticketsData from '../../utils/fakeData';
 import sortByPrice from '../../utils/sortByPrice';
 import Tickets from '../Tickets';
 import OptionsList from '../OptionsList';
 import R from 'ramda';
 
-const sortedTicketsData = sortByPrice(ticketsData);
-
 const optionAllData = {
-  id: 'stops#all',
+  id: 'stops#-1',
   label: 'Все',
-  stops: 1000
+  stops: -1
 };
 
 const optionsData = [{
-  id: 'stops#no',
+  id: 'stops#0',
   label: 'Без пересадок',
   stops: 0
 }, {
@@ -42,8 +39,21 @@ class App extends Component {
 
     // initial state
     this.state = {
-      currentOptions: R.concat(optionsData, [optionAllData])
+      currentOptions: R.concat(optionsData, [optionAllData]),
+      sortedTicketsData: []
     };
+  }
+
+  componentDidMount() {
+    fetch('/tickets.json')
+      .then(response => response.json())
+      .then(data => this.setState(
+        R.compose(
+          R.merge(this.state),
+          R.objOf('sortedTicketsData'),
+          sortByPrice
+        )(data.tickets)
+      ));
   }
 
   handleAllOptionSelect(option, checked) {
@@ -101,7 +111,7 @@ class App extends Component {
   }
 
   render() {
-    const { currentOptions } = this.state;
+    const { currentOptions, sortedTicketsData } = this.state;
     const currentTicketsData = this.getCurrentTicketsData(currentOptions, optionAllData, sortedTicketsData);
 
 
