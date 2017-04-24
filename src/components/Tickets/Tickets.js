@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react';
 import Ticket from '../Ticket';
 
 class Tickets extends PureComponent {
+
   render() {
     const { tickets } = this.props;
     return (

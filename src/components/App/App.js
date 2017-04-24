@@ -8,24 +8,29 @@ import R from 'ramda';
 const optionAllData = {
   id: 'stops#-1',
   label: 'Все',
+  group: true,
   stops: -1
 };
 
 const optionsData = [{
   id: 'stops#0',
   label: 'Без пересадок',
+  group: false,
   stops: 0
 }, {
   id: 'stops#1',
   label: '1 пересадка',
+  group: false,
   stops: 1
 }, {
   id: 'stops#2',
   label: '2 пересадки',
+  group: false,
   stops: 2
 }, {
   id: 'stops#3',
   label: '3 пересадки',
+  group: false,
   stops: 3
 }];
 
@@ -56,7 +61,7 @@ class App extends Component {
       ));
   }
 
-  handleAllOptionSelect(option, checked) {
+  handleAllOptionSelect({ checked }) {
     const newState = R.pipe(
       R.ifElse(
         R.equals(true),
@@ -69,7 +74,7 @@ class App extends Component {
     this.setState(newState);
   }
 
-  handleOptionSelect(option, checked) {
+  handleOptionSelect({ option, checked }) {
     const { currentOptions } = this.state;
     const newState = R.pipe(
       R.ifElse(
@@ -92,7 +97,19 @@ class App extends Component {
     this.setState(newState);
   }
 
-  handleSelect(option) {
+  handleOnlyOptionSelect({ option }) {
+    const { currentOptions } = this.state;
+
+    if (!R.equals(currentOptions, [option])) {
+      const newState = R.objOf('currentOptions', [option]);
+      this.setState(newState);
+    }
+  }
+
+  handleSelect({ option, isOnly }) {
+    if (isOnly) {
+      return this.handleOnlyOptionSelect.apply(this, arguments);
+    }
     if (R.equals(option, optionAllData)) {
       return this.handleAllOptionSelect.apply(this, arguments);
     }
@@ -117,13 +134,18 @@ class App extends Component {
 
     return (
       <div>
-        <OptionsList
-          textField="label"
-          valueField="id"
-          onSelect={this.handleSelect}
-          options={options}
-          values={currentOptions} />
-        <Tickets tickets={currentTicketsData} />
+        <section className="filters-panel">
+          <OptionsList
+            textField="label"
+            valueField="id"
+            groupField="group"
+            onSelect={this.handleSelect}
+            options={options}
+            values={currentOptions} />
+        </section>
+        <section className="search-results">
+          <Tickets tickets={currentTicketsData} />
+        </section>
       </div>
     );
   }

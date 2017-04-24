@@ -1,50 +1,54 @@
-import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
+import React from 'react';
+import Checkbox from '../Checkbox';
+import OptionContent from '../OptionContent';
+import {
+  compose,
+  mapProps,
+  withHandlers,
+  withState,
+  onlyUpdateForKeys
+} from 'recompose';
 
-class Option extends PureComponent {
+const enhance = compose(
+  withState('isOnly', 'updateValue', false),
+  withHandlers((initialProps) => {
+    const {
+      onSelect,
+      option
+    } = initialProps;
 
-  constructor(props) {
-    super(props);
-    this.handleChange = this.handleChange.bind(this);
-  }
-
-  handleChange(e) {
+    return {
+      onChange: ({ updateValue, isOnly }) => event => {
+        onSelect({
+          option,
+          checked: event.target.checked,
+          isOnly,
+          event
+        });
+        updateValue(false);
+      },
+      onClick: ({ updateValue }) => () => {
+        updateValue(true);
+      }
+    };
+  }),
+  mapProps(props => {
     const {
       option,
-      onChange
-    } = this.props;
+      optionValue,
+      onChange,
+      isSelected,
+      onClick,
+      hasButton
+    } = props;
+    return {
+      id: option.id,
+      onChange,
+      isChecked: isSelected,
+      children: <OptionContent value={optionValue} hasButton={hasButton} onClick={onClick} />
+    };
+  }),
+  onlyUpdateForKeys(['isChecked'])
+);
 
-    onChange(option, e.target.checked, e);
-  }
-
-  render() {
-    const {
-      children,
-      isSelected
-    } = this.props;
-
-    return (
-      <label>
-        <input
-          type="checkbox"
-          checked={isSelected}
-          onChange={this.handleChange} />
-          { children }
-      </label>
-    );
-  };
-}
-
-Option.propTypes = {
-  option: PropTypes.any,
-  isSelected: PropTypes.bool,
-  onChange: PropTypes.func
-};
-
-Option.defaultProps = {
-  option: {},
-  isSelected: false,
-  onChange: () => {}
-};
-
-export default Option;
+export default enhance(Checkbox);
