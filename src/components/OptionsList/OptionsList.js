@@ -12,6 +12,7 @@ class OptionsList extends PureComponent {
       values,
       valueField,
       textField,
+      groupField,
       className,
       onSelect
     } = this.props;
@@ -21,16 +22,17 @@ class OptionsList extends PureComponent {
         const key = R.propOr(`option_${index}`, valueField, option);
         const isSelected = R.contains(option, values);
         const optionValue = R.prop(textField, option);
+        const hasButton = !R.prop(groupField, option);
         return (
           <li
             key={key}
             className="options-list__item">
               <Option
+                optionValue={optionValue}
+                hasButton={hasButton}
                 isSelected={isSelected}
-                onChange={onSelect}
+                onSelect={onSelect}
                 option={option}>
-                { optionValue }
-                <span onClick={() => console.log('click')}>{ 'Only' }</span>
               </Option>
           </li>
         );
@@ -53,6 +55,7 @@ OptionsList.propTypes = {
   onSelect: PropTypes.func,
   textField: PropTypes.string,
   valueField: PropTypes.string,
+  groupField: PropTypes.string,
   itemComponent: PropTypes.element
 };
 

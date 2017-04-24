@@ -1,3 +1,4 @@
+/*eslint-disable no-script-url */
 import React, { PureComponent } from 'react';
 
 class Ticket extends PureComponent {
@@ -7,7 +8,7 @@ class Ticket extends PureComponent {
       <div className="ticket">
         <div className="ticket__card">
           <div className="ticket__carrier">{ticket.carrier}</div>
-          <div className="ticket__purchase-button">{ticket.price}</div>
+          <a href="javascript:void(0)" className="ticket__purchase-link">{ticket.price}</a>
         </div>
         <div className="ticket__metadata">
           <div className="ticket__origin">
