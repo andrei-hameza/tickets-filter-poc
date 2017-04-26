@@ -11,6 +11,7 @@ import {
 import './Option.css';
 
 const enhance = compose(
+  onlyUpdateForKeys(['isSelected']),
   withState('isOnly', 'updateValue', false),
   withHandlers((initialProps) => {
     const {
@@ -53,7 +54,6 @@ const enhance = compose(
       ...other
     };
   }),
-  onlyUpdateForKeys(['isChecked'])
 );
 
 export default enhance(Checkbox);
