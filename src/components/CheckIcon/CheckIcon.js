@@ -1,4 +1,7 @@
 import React from 'react';
+import {
+  pure
+} from 'recompose';
 import cn from 'classnames';
 
 const CheckIcon = ({
@@ -21,4 +24,4 @@ const CheckIcon = ({
   );
 };
 
-export default CheckIcon;
+export default pure(CheckIcon);
