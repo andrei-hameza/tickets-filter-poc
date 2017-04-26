@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Option from '../Option';
 import cn from 'classnames';
 import R from 'ramda';
+import './OptionsList.css';
 
 class OptionsList extends PureComponent {
 

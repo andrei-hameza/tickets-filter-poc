@@ -1,0 +1,15 @@
+.options-list {
+
+  &__item {
+    font-size: 0.825rem;
+    line-height: 2.25rem;
+
+    &:hover {
+      background-color: #F1FCFF;
+    }
+
+    &:focus {
+      color: red;
+    }
+  }
+}
