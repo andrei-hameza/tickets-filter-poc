@@ -7,6 +7,7 @@ import OptionsList from '../OptionsList';
 import SearchResults from '../SearchResults';
 import Tickets from '../Tickets';
 import R from 'ramda';
+import Perf from 'react-addons-perf';
 
 const optionAllData = {
   id: 'stops#-1',
@@ -64,6 +65,12 @@ class App extends Component {
       ));
   }
 
+  componentDidUpdate() {
+    Perf.stop();
+    Perf.printInclusive();
+    Perf.printWasted();
+  }
+
   handleAllOptionSelect({ checked }) {
     const newState = R.pipe(
       R.ifElse(
@@ -74,6 +81,8 @@ class App extends Component {
       R.objOf('currentOptions'),
       R.merge(this.state)
     )(checked);
+
+    Perf.start();
     this.setState(newState);
   }
 
@@ -97,6 +106,7 @@ class App extends Component {
       R.merge(this.state)
     )(checked);
 
+    Perf.start();
     this.setState(newState);
   }
 
@@ -105,6 +115,7 @@ class App extends Component {
 
     if (!R.equals(currentOptions, [option])) {
       const newState = R.objOf('currentOptions', [option]);
+      Perf.start();
       this.setState(newState);
     }
   }
