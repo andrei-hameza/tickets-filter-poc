@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
-import './App.css';
 import sortByPrice from '../../utils/sortByPrice';
-import Tickets from '../Tickets';
+import Header from '../Header';
+import FiltersPanel from '../FiltersPanel';
+import Heading from '../Heading';
 import OptionsList from '../OptionsList';
+import SearchResults from '../SearchResults';
+import Tickets from '../Tickets';
 import R from 'ramda';
 
 const optionAllData = {
@@ -133,19 +136,26 @@ class App extends Component {
 
 
     return (
-      <div>
-        <section className="filters-panel">
-          <OptionsList
-            textField="label"
-            valueField="id"
-            groupField="group"
-            onSelect={this.handleSelect}
-            options={options}
-            values={currentOptions} />
-        </section>
-        <section className="search-results">
-          <Tickets tickets={currentTicketsData} />
-        </section>
+      <div className="app l-wrap">
+        <Header className="l-app" />
+        <div className="app__main l-app">
+          <FiltersPanel className="grid-item l-sidebar">
+            <Heading
+              className="filters-panel__heading"
+              heading={'Количество пересадок'} />
+            <OptionsList
+              className="filters-panel__content"
+              textField="label"
+              valueField="id"
+              groupField="group"
+              onSelect={this.handleSelect}
+              options={options}
+              values={currentOptions} />
+          </FiltersPanel>
+          <SearchResults className="grid-item l-main">
+            <Tickets tickets={currentTicketsData} />
+          </SearchResults>
+        </div>
       </div>
     );
   }
