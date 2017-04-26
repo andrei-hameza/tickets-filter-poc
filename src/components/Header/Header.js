@@ -1,4 +1,5 @@
 import React from 'react';
+import Logo from '../Logo';
 import {
   pure
 } from 'recompose';
@@ -9,7 +10,7 @@ const Header = ({ className, ...other }) => {
 
   return (
     <header className={cn('app__header', className)} {...other}>
-      <a href="javascript:void(0)" className="app__header__logo"></a>
+      <Logo className="app__header__logo" href="/" />
     </header>
   );
 };
