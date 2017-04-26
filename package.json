@@ -2,6 +2,7 @@
   "name": "tickets-filter-poc",
   "version": "0.1.0",
   "dependencies": {
+    "npm-font-open-sans": "^1.0.3",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
     "recompose": "^0.23.1"
