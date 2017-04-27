@@ -17,6 +17,9 @@
   @include clearfix;
 
   & .grid-item {
+    padding-left: 10px;
+    padding-right: 10px;
+    
     @media (min-width: 700px) {
       padding-left: 10px;
       padding-right: 10px;
@@ -26,7 +29,7 @@
 
   & .l-sidebar {
     @media (min-width: 700px) {
-      width: percentage(5/12);
+      width: percentage(4/12);
       float: left;
     }
 
@@ -37,7 +40,7 @@
   }
   & .l-main {
     @media (min-width: 700px) {
-      width: percentage(7/12);
+      width: percentage(8/12);
       margin-top: 0;
       float: right;
     }

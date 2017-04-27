@@ -1,3 +1,4 @@
+/*eslint-disable no-script-url */
 import React from 'react';
 import cn from 'classnames';
 import './Logo.css';

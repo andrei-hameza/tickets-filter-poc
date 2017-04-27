@@ -1,13 +1,18 @@
 .tickets-list {
 
   &__item {
-    box-shadow: 0 0 6px 0px rgba(0, 0, 0, 0.1);
-    background-color: #FFF;
-    border-radius: 5px;
     margin: 20px 0;
+  }
+}
 
-    &:first-of-type {
-      margin-top: 0;
+@media (min-width: 900px) {
+  .tickets-list {
+
+    &__item {
+
+      &:first-of-type {
+        margin-top: 0;
+      }
     }
   }
 }
