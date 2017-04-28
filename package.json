@@ -11,6 +11,7 @@
     "recompose": "^0.23.1"
   },
   "devDependencies": {
+    "babel-core": "^6.24.1",
     "classnames": "^2.2.5",
     "eslint": "^3.19.0",
     "eslint-plugin-pureness": "^2.2.1",
