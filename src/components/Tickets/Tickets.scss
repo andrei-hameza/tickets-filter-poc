@@ -1,0 +1,18 @@
+.tickets-list {
+
+  &__item {
+    margin: 20px 0;
+  }
+}
+
+@media (min-width: 700px) {
+  .tickets-list {
+
+    &__item {
+
+      &:first-of-type {
+        margin-top: 0;
+      }
+    }
+  }
+}

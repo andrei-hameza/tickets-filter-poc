@@ -1,0 +1,15 @@
+.filters-panel {
+  box-shadow: 0 0 6px 0px rgba(0, 0, 0, 0.1);
+  background-color: #FFF;
+  padding: 10px 0;
+  border-radius: 5px;
+
+  &__heading {
+    padding: 0 15px 8px;
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #4a4a4a;
+    text-transform: uppercase;
+  }
+}

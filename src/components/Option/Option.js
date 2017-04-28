@@ -8,8 +8,10 @@ import {
   withState,
   onlyUpdateForKeys
 } from 'recompose';
+import './Option.css';
 
 const enhance = compose(
+  onlyUpdateForKeys(['isSelected']),
   withState('isOnly', 'updateValue', false),
   withHandlers((initialProps) => {
     const {
@@ -39,16 +41,19 @@ const enhance = compose(
       onChange,
       isSelected,
       onClick,
-      hasButton
+      hasButton,
+      isOnly, // eslint-disable-line no-unused-vars
+      updateValue, // eslint-disable-line no-unused-vars
+      ...other
     } = props;
     return {
       id: option.id,
       onChange,
       isChecked: isSelected,
-      children: <OptionContent value={optionValue} hasButton={hasButton} onClick={onClick} />
+      children: <OptionContent value={optionValue} hasButton={hasButton} onClick={onClick} />,
+      ...other
     };
   }),
-  onlyUpdateForKeys(['isChecked'])
 );
 
 export default enhance(Checkbox);

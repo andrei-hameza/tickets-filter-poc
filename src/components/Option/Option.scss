@@ -1,0 +1,32 @@
+.option {
+
+  &__content {
+    display: inline-block;
+    vertical-align: middle;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: calc(100% - 100px);
+  }
+
+  &__value {
+    margin-left: 10px;
+  }
+
+  &__button {
+    position: absolute;
+    right: 0;
+    top: 0;
+    color: #3E9CE8;
+    opacity: 0;
+    padding: 0 15px;
+    text-transform: uppercase;
+    transform: scale3d(0.8,0.8,1) translate3d(0,-10px,0);
+    transition: opacity 0.24s, transform 0.24s;
+
+    .options-list__item:hover & {
+      opacity: 1;
+      transform: translate3d(0,0,0);
+    }
+  }
+}

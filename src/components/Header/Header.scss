@@ -1,0 +1,13 @@
+.app__header {
+  display: flex;
+  height: 165px;
+
+  &__logo {
+    display: block;
+    height: 85px;
+    width: 80px;
+    margin: auto;
+    background: url(../../images/logo.svg) no-repeat;
+    background-size: cover;
+  }
+}

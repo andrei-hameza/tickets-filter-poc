@@ -1,40 +1,15 @@
 import React, { Component } from 'react';
-import './App.css';
 import sortByPrice from '../../utils/sortByPrice';
-import Tickets from '../Tickets';
+import formatTicketsData from '../../utils/formatTicketsData';
+import generateFiltersConfig from '../../utils/generateFiltersConfig';
+import Header from '../Header';
+import FiltersPanel from '../FiltersPanel';
+import Heading from '../Heading';
 import OptionsList from '../OptionsList';
+import SearchResults from '../SearchResults';
+import Tickets from '../Tickets';
 import R from 'ramda';
-
-const optionAllData = {
-  id: 'stops#-1',
-  label: 'Все',
-  group: true,
-  stops: -1
-};
-
-const optionsData = [{
-  id: 'stops#0',
-  label: 'Без пересадок',
-  group: false,
-  stops: 0
-}, {
-  id: 'stops#1',
-  label: '1 пересадка',
-  group: false,
-  stops: 1
-}, {
-  id: 'stops#2',
-  label: '2 пересадки',
-  group: false,
-  stops: 2
-}, {
-  id: 'stops#3',
-  label: '3 пересадки',
-  group: false,
-  stops: 3
-}];
-
-const options = R.concat([optionAllData], optionsData);
+import Perf from 'react-addons-perf';
 
 class App extends Component {
 
@@ -44,7 +19,8 @@ class App extends Component {
 
     // initial state
     this.state = {
-      currentOptions: R.concat(optionsData, [optionAllData]),
+      currentOptions: [],
+      options: [],
       sortedTicketsData: []
     };
   }
@@ -52,30 +28,49 @@ class App extends Component {
   componentDidMount() {
     fetch('/tickets.json')
       .then(response => response.json())
-      .then(data => this.setState(
-        R.compose(
-          R.merge(this.state),
-          R.objOf('sortedTicketsData'),
-          sortByPrice
+      .then(data => R.compose(
+          sortByPrice,
+          formatTicketsData
         )(data.tickets)
-      ));
+      ).then(formattedData => {
+        const options = generateFiltersConfig(formattedData);
+        this.setState({
+          sortedTicketsData: formattedData,
+          options,
+          currentOptions: R.clone(options)
+        });
+      });
+  }
+
+  componentDidUpdate() {
+    Perf.stop();
+    Perf.printInclusive();
+    Perf.printWasted();
   }
 
   handleAllOptionSelect({ checked }) {
     const newState = R.pipe(
       R.ifElse(
         R.equals(true),
-        R.always(R.concat(optionsData, [optionAllData])),
+        R.always(R.clone(this.state.options)),
         R.always([])
       ),
       R.objOf('currentOptions'),
       R.merge(this.state)
     )(checked);
+
+    Perf.start();
     this.setState(newState);
   }
 
   handleOptionSelect({ option, checked }) {
-    const { currentOptions } = this.state;
+    const {
+      currentOptions,
+      options
+    } = this.state;
+
+    const findGroupItem = R.find(R.propEq('group', true));
+
     const newState = R.pipe(
       R.ifElse(
         R.equals(true),
@@ -84,16 +79,19 @@ class App extends Component {
       ),
       R.ifElse(
         R.pipe(
-          R.symmetricDifference(optionsData),
+          R.symmetricDifference(
+            R.reject(R.propEq('group', true))(options)
+          ),
           R.isEmpty
         ),
-        R.concat([optionAllData]),
-        R.reject(R.equals(optionAllData))
+        R.concat([findGroupItem(options)]),
+        R.reject(R.equals(findGroupItem(options)))
       ),
       R.objOf('currentOptions'),
       R.merge(this.state)
     )(checked);
 
+    Perf.start();
     this.setState(newState);
   }
 
@@ -102,6 +100,7 @@ class App extends Component {
 
     if (!R.equals(currentOptions, [option])) {
       const newState = R.objOf('currentOptions', [option]);
+      Perf.start();
       this.setState(newState);
     }
   }
@@ -110,42 +109,56 @@ class App extends Component {
     if (isOnly) {
       return this.handleOnlyOptionSelect.apply(this, arguments);
     }
-    if (R.equals(option, optionAllData)) {
+    if (R.prop('group', option)) {
       return this.handleAllOptionSelect.apply(this, arguments);
     }
     return this.handleOptionSelect.apply(this, arguments);
 
   }
 
-  getCurrentTicketsData(currentOptions, optionAllData, sortedTicketsData) {
-    if (R.contains(optionAllData, currentOptions)) {
+  getCurrentTicketsData(currentOptions, sortedTicketsData) {
+    if (R.find(R.propEq('group', true))(currentOptions)) {
       return R.clone(sortedTicketsData);
     }
     const indexedCurrentOptions = R.indexBy(R.prop('stops'), currentOptions);
     const testPropInIndexedCurrentOptions = R.partialRight(R.prop, [indexedCurrentOptions]);
-    const filterByStopsPredicate = (item) => testPropInIndexedCurrentOptions(R.prop('stops', item));
+    const filterByStopsPredicate = (item) => testPropInIndexedCurrentOptions(R.prop('stopsAmount', item));
     return R.filter(filterByStopsPredicate, sortedTicketsData);
   }
 
   render() {
-    const { currentOptions, sortedTicketsData } = this.state;
-    const currentTicketsData = this.getCurrentTicketsData(currentOptions, optionAllData, sortedTicketsData);
+    const {
+      currentOptions,
+      sortedTicketsData,
+      options
+    } = this.state;
 
+    const currentTicketsData = this.getCurrentTicketsData(
+      currentOptions,
+      sortedTicketsData
+    );
 
     return (
-      <div>
-        <section className="filters-panel">
-          <OptionsList
-            textField="label"
-            valueField="id"
-            groupField="group"
-            onSelect={this.handleSelect}
-            options={options}
-            values={currentOptions} />
-        </section>
-        <section className="search-results">
-          <Tickets tickets={currentTicketsData} />
-        </section>
+      <div className="app l-wrap">
+        <Header className="l-app" />
+        <div className="app__main l-app">
+          <FiltersPanel className="grid-item l-sidebar">
+            <Heading
+              className="filters-panel__heading"
+              heading={'Количество пересадок'} />
+            <OptionsList
+              className="filters-panel__content"
+              textField="label"
+              valueField="id"
+              groupField="group"
+              onSelect={this.handleSelect}
+              options={options}
+              values={currentOptions} />
+          </FiltersPanel>
+          <SearchResults className="grid-item l-main">
+            <Tickets tickets={currentTicketsData} />
+          </SearchResults>
+        </div>
       </div>
     );
   }

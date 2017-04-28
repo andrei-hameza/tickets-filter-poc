@@ -7,7 +7,7 @@ const OptionContent = ({ value, hasButton, onClick }) => {
 
   return (
     <span className="option__content">
-      <span>{value}</span>
+      <span className="option__value">{value}</span>
       {hasButton && (<span className="option__button" onClick={onClick}>Только</span>)}
     </span>
   );
