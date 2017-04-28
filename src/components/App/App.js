@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import sortByPrice from '../../utils/sortByPrice';
+import formatTicketsData from '../../utils/formatTicketsData';
+import generateFiltersConfig from '../../utils/generateFiltersConfig';
 import Header from '../Header';
 import FiltersPanel from '../FiltersPanel';
 import Heading from '../Heading';
@@ -9,37 +11,6 @@ import Tickets from '../Tickets';
 import R from 'ramda';
 import Perf from 'react-addons-perf';
 
-const optionAllData = {
-  id: 'stops#-1',
-  label: 'Все',
-  group: true,
-  stops: -1
-};
-
-const optionsData = [{
-  id: 'stops#0',
-  label: 'Без пересадок',
-  group: false,
-  stops: 0
-}, {
-  id: 'stops#1',
-  label: '1 пересадка',
-  group: false,
-  stops: 1
-}, {
-  id: 'stops#2',
-  label: '2 пересадки',
-  group: false,
-  stops: 2
-}, {
-  id: 'stops#3',
-  label: '3 пересадки',
-  group: false,
-  stops: 3
-}];
-
-const options = R.concat([optionAllData], optionsData);
-
 class App extends Component {
 
   constructor(props) {
@@ -48,7 +19,8 @@ class App extends Component {
 
     // initial state
     this.state = {
-      currentOptions: R.concat(optionsData, [optionAllData]),
+      currentOptions: [],
+      options: [],
       sortedTicketsData: []
     };
   }
@@ -56,13 +28,18 @@ class App extends Component {
   componentDidMount() {
     fetch('/tickets.json')
       .then(response => response.json())
-      .then(data => this.setState(
-        R.compose(
-          R.merge(this.state),
-          R.objOf('sortedTicketsData'),
-          sortByPrice
+      .then(data => R.compose(
+          sortByPrice,
+          formatTicketsData
         )(data.tickets)
-      ));
+      ).then(formattedData => {
+        const options = generateFiltersConfig(formattedData);
+        this.setState({
+          sortedTicketsData: formattedData,
+          options,
+          currentOptions: R.clone(options)
+        });
+      });
   }
 
   componentDidUpdate() {
@@ -75,7 +52,7 @@ class App extends Component {
     const newState = R.pipe(
       R.ifElse(
         R.equals(true),
-        R.always(R.concat(optionsData, [optionAllData])),
+        R.always(R.clone(this.state.options)),
         R.always([])
       ),
       R.objOf('currentOptions'),
@@ -87,7 +64,13 @@ class App extends Component {
   }
 
   handleOptionSelect({ option, checked }) {
-    const { currentOptions } = this.state;
+    const {
+      currentOptions,
+      options
+    } = this.state;
+
+    const findGroupItem = R.find(R.propEq('group', true));
+
     const newState = R.pipe(
       R.ifElse(
         R.equals(true),
@@ -96,11 +79,13 @@ class App extends Component {
       ),
       R.ifElse(
         R.pipe(
-          R.symmetricDifference(optionsData),
+          R.symmetricDifference(
+            R.reject(R.propEq('group', true))(options)
+          ),
           R.isEmpty
         ),
-        R.concat([optionAllData]),
-        R.reject(R.equals(optionAllData))
+        R.concat([findGroupItem(options)]),
+        R.reject(R.equals(findGroupItem(options)))
       ),
       R.objOf('currentOptions'),
       R.merge(this.state)
@@ -124,27 +109,34 @@ class App extends Component {
     if (isOnly) {
       return this.handleOnlyOptionSelect.apply(this, arguments);
     }
-    if (R.equals(option, optionAllData)) {
+    if (R.prop('group', option)) {
       return this.handleAllOptionSelect.apply(this, arguments);
     }
     return this.handleOptionSelect.apply(this, arguments);
 
   }
 
-  getCurrentTicketsData(currentOptions, optionAllData, sortedTicketsData) {
-    if (R.contains(optionAllData, currentOptions)) {
+  getCurrentTicketsData(currentOptions, sortedTicketsData) {
+    if (R.find(R.propEq('group', true))(currentOptions)) {
       return R.clone(sortedTicketsData);
     }
     const indexedCurrentOptions = R.indexBy(R.prop('stops'), currentOptions);
     const testPropInIndexedCurrentOptions = R.partialRight(R.prop, [indexedCurrentOptions]);
-    const filterByStopsPredicate = (item) => testPropInIndexedCurrentOptions(R.prop('stops', item));
+    const filterByStopsPredicate = (item) => testPropInIndexedCurrentOptions(R.prop('stopsAmount', item));
     return R.filter(filterByStopsPredicate, sortedTicketsData);
   }
 
   render() {
-    const { currentOptions, sortedTicketsData } = this.state;
-    const currentTicketsData = this.getCurrentTicketsData(currentOptions, optionAllData, sortedTicketsData);
+    const {
+      currentOptions,
+      sortedTicketsData,
+      options
+    } = this.state;
 
+    const currentTicketsData = this.getCurrentTicketsData(
+      currentOptions,
+      sortedTicketsData
+    );
 
     return (
       <div className="app l-wrap">

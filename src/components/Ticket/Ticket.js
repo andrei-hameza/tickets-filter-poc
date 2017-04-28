@@ -4,7 +4,6 @@ import Logo from '../Logo';
 import LinkButton from '../LinkButton';
 import Metadata from '../Metadata';
 import './Ticket.css';
-import test from '../../images/carriers/turkish-airlines.svg';
 import cn from 'classnames';
 
 class Ticket extends PureComponent {
@@ -33,7 +32,7 @@ class Ticket extends PureComponent {
       <div className={cn('ticket', { 'ticket_active': isActive })}>
         <div className="ticket__card">
           <Logo className="ticket__carrier">
-            <img className="ticket__carrier__logo" src={test} alt={ticket.carrier}></img>
+            <img className="ticket__carrier__logo" src={ticket.carrierLogo} alt={ticket.carrierName}></img>
           </Logo>
           <LinkButton
             onMouseEnter={this.handleMouseEnter}
@@ -54,17 +53,17 @@ class Ticket extends PureComponent {
         <div className="ticket__details">
           <Metadata
             className="ticket__origin"
-            metadataTime={ticket.departure_time}
-            metadataName={ticket.origin_name}
-            metadataDate={ticket.departure_date} />
+            metadataTime={ticket.departureTime}
+            metadataName={ticket.origin}
+            metadataDate={ticket.departureDate} />
           <div className="ticket__stops-amount">
-            {!!ticket.stops && [ticket.stops, 'пересадки'].join(' ')}
+            {ticket.stops}
           </div>
           <Metadata
             className="ticket__destination"
-            metadataTime={ticket.arrival_time}
-            metadataName={ticket.destination_name}
-            metadataDate={ticket.arrival_date} />
+            metadataTime={ticket.arrivalTime}
+            metadataName={ticket.destination}
+            metadataDate={ticket.arrivalDate} />
         </div>
       </div>
     );
